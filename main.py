@@ -19,8 +19,8 @@ unseen_idx_list = list(unseen_idx_set)
 
 class_of_all_images = [-1]*len(paths_of_images) # stores the class annotations of all the images by initialising -1.
 indices_of_displayed = list(range(24)) # stores indices of currently displayed images
-with open('fundus_data.json','r') as f:
-# with open('mnist_data.json','r') as f:
+with open('mnist_data.json','r') as f:
+# with open('fundus_data.json','r') as f:
     m = json.loads(f.read())
     for i in range(len(paths_of_images)):
         class_of_all_images[i] = m[paths_of_images[i].split("/")[-1]]
@@ -124,4 +124,4 @@ def button_click(value, id):
 
 
 if __name__ == '__main__':
-    app.run_server(host='127.0.0.1', port=6320 ,debug=True)
+    app.run_server(host='127.0.0.1', port=3320 ,debug=True)
