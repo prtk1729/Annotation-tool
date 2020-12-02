@@ -9,9 +9,6 @@ from glob import glob
 import json
 ## Global variables 
 
-with open('data1.json') as f: 
-  data = json.load(f) 
-# print(data)
 
 paths_of_images = glob('static/mnist/*.jpg')
 # paths_of_images = glob('static/f_le/*.png')
