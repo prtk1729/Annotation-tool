@@ -22,8 +22,8 @@ unseen_idx_list = list(unseen_idx_set)
 
 class_of_all_images = [-1]*len(paths_of_images) # stores the class annotations of all the images by initialising -1.
 indices_of_displayed = list(range(24)) # stores indices of currently displayed images
-with open('data1.json','r') as f:
-# with open('data.json','r') as f:
+with open('fundus_data.json','r') as f:
+# with open('mnist_data.json','r') as f:
     m = json.loads(f.read())
     for i in range(len(paths_of_images)):
         class_of_all_images[i] = m[paths_of_images[i].split("/")[-1]]
@@ -105,8 +105,8 @@ def save(c1):
     for i in range(len(class_of_all_images)):
         m[paths_of_images[i].split("/")[-1]] = class_of_all_images[i]
     
-    with open('data1.json', "w+") as f:
-    # with open('data.json', "w+") as f:
+    # with open('fundus_data.json', "w+") as f:
+    with open('mnist_data.json', "w+") as f:
         f.write(json.dumps(m))
     print(c1)
     return ""
