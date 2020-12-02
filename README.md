@@ -1,2 +1,2 @@
 # Annoation-Tool
-A tool to annotate datapoints(images) in a dataset efficiently by incorporating ML techniques.
+A tool to annotate images in a large dataset efficiently by incorporating Machine Learning techniques.
