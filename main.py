@@ -13,8 +13,8 @@ with open('data1.json') as f:
   data = json.load(f) 
 # print(data)
 
-paths_of_images = sorted(glob('static/mnist/*.jpg'))
-paths_of_images = glob('static/f_le/*.png')
+paths_of_images = glob('static/mnist/*.jpg')
+# paths_of_images = glob('static/f_le/*.png')
 req_dict = {le:'-1' for le in paths_of_images}
 # print(type(paths_of_images)) #list
 unseen_idx_set = set([i for i in range(len(paths_of_images))])
