@@ -10,6 +10,16 @@ import json
 ## Global variables 
 
 
+def check_point():
+    '''function reads the last_checkpoint file and returns the current iter_no'''
+    with open('./last_checkpoint.txt') as lc:
+        iter_no = lc.read()
+    lc.close()
+    iter_no = int(iter_no)
+    return iter_no
+iter_no = check_point()
+
+
 paths_of_images = glob('static/mnist/*.jpg')
 glob_idx = [i for i in range(len(paths_of_images))]
 
@@ -133,7 +143,7 @@ def save(c1):
     '''On Clicking save save (1)recordings into mnist_data.json, 
     (2)save unseen idx already calculated in its next call into your_file.txt'''
 
-
+    global iter_no
     global class_of_all_images
     global indices_of_displayed
     global unseen_idx_set
@@ -156,7 +166,14 @@ def save(c1):
     with open('your_file.txt', 'w') as f:
         for item in ssil:
             f.write("%s\n" % item)
-    print(c1)
+
+    # write next iteration number onto last_checkpoint file
+    iter_no += 1
+    file1 = open("./last_checkpoint.txt","w") 
+    file1.write('{}'.format(str(iter_no)))
+    file1.close()
+
+    # print(c1)
     return ""
 
 @app.callback(
@@ -169,6 +186,7 @@ def button_click(value, id):
     # I ahve the value of the recording here , 
     # Manipulate here and store in a datastructure and fire when save is clicked
     # print(f"val: {value}, id: {id}")
+
     global glob_idx
     global req_dict
     class_of_all_images[int(id['index'])] = int(value)
@@ -180,4 +198,4 @@ def button_click(value, id):
 
 
 if __name__ == '__main__':
-    app.run_server(host='127.0.0.1', port=2420 ,debug=True)
+    app.run_server(host='127.0.0.1', port=2490 ,debug=True)
