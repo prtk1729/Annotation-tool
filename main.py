@@ -12,23 +12,49 @@ import json
 
 paths_of_images = glob('static/mnist/*.jpg')
 glob_idx = [i for i in range(len(paths_of_images))]
-# paths_of_images = glob('static/f_le/*.png')
-req_dict = {le:'-1' for le in paths_of_images}
-# print(type(paths_of_images)) #list
-unseen_idx_set = set([i for i in range(len(paths_of_images))])
-unseen_idx_list = list(unseen_idx_set)
+
 
 class_of_all_images = [-1]*len(paths_of_images) # stores the class annotations of all the images by initialising -1.
-indices_of_displayed = list(range(24)) # stores indices of currently displayed images
-
-# Here read from file logic for every new session
+# data retrieval for states
 with open('mnist_data.json','r') as f:
 # with open('fundus_data.json','r') as f:
     m = json.loads(f.read())
     for i in range(len(paths_of_images)):
         class_of_all_images[i] = m[paths_of_images[i].split("/")[-1]]
-
 # print(class_of_all_images) #states of all the images uptil this point.
+
+unseen_idx_set = set({})
+unseen_idx_list = []
+
+req_dict = {le:'-1' for le in paths_of_images} #for this load dict
+
+
+
+# start of session reads from your_file.txt for unseen_idx_set
+my_file = open("./your_file.txt", "r")
+content = my_file.read()
+if len(list(content)) == 0:
+    unseen_idx_set = set([i for i in range(len(paths_of_images))])
+    unseen_idx_list = list(unseen_idx_set)
+else:
+    ssi = list(content.split('\n'))
+    ssi = [int(le) for le in ssi if le != '']
+    # print(f'ssi: {ssi}')
+    unseen_idx_set = set(ssi)
+    unseen_idx_list = list(unseen_idx_set)
+
+
+
+
+def predict_next_24_states():
+    '''invoked from next i.e when "next_btn" is clicked and Uses ML to predict
+    placeholders for next set of 24 points.....for now placeholders follow the following logic'''
+    pass
+
+def most_confused_24():
+    '''calculates most confused 24 images based on HITL....
+    for now random 24 from unseen_idx_set'''
+    pass
 
 def card_body(card_id):
     return [
@@ -72,14 +98,14 @@ app.layout = html.Div([
 
 ], style={'text-align': "center", "margin": "1em 0em"})
 
-def gen_cards(batch):
+def gen_cards(current_24):
     return [
         dbc.Row([
-            dbc.Col([card(i)]) for i in batch[:8]], justify="start"),
+            dbc.Col([card(i)]) for i in current_24[:8]], justify="start"),
         dbc.Row([
-            dbc.Col([card(i)]) for i in batch[8:16]], justify="center"),
+            dbc.Col([card(i)]) for i in current_24[8:16]], justify="center"),
         dbc.Row([
-            dbc.Col([card(i)]) for i in batch[16:24]], justify="end"),
+            dbc.Col([card(i)]) for i in current_24[16:24]], justify="end"),
         ]
 
 @app.callback(
@@ -87,17 +113,16 @@ def gen_cards(batch):
     Input("next", "n_clicks")
 )
 def next(c1):
-    # if it's check_point 0
-    # else if it's not predict next set of checkpoints and initialize to radiobuttons
-    # For this understand working of gen_cards, card, card_body, 
+    '''calculates next set of 24 indices and assigns placeholders to these before loading
+    invoke most_confused_24 and then predict_next_24_states'''
     global class_of_all_images
-    print(class_of_all_images)
+    # print(class_of_all_images)
     global indices_of_displayed
     global unseen_idx_set
-    batch = list(unseen_idx_set)[:24]    
-    unseen_idx_set = unseen_idx_set.difference(set(batch))
-    indices_of_displayed = batch
-    return gen_cards(indices_of_displayed)
+
+    # no need to read from your_file.txt
+    current_24 = list(unseen_idx_set)[:24]    
+    return gen_cards(current_24)
 
 
 @app.callback(
@@ -105,16 +130,32 @@ def next(c1):
     Input("save", "n_clicks")
 )
 def save(c1):
+    '''On Clicking save save (1)recordings into mnist_data.json, 
+    (2)save unseen idx already calculated in its next call into your_file.txt'''
+
+
     global class_of_all_images
+    global indices_of_displayed
+    global unseen_idx_set
+    current_24 = list(unseen_idx_set)[:24]    
+
     m = {}
     print(c1)
+
+    # Save recordings
     for i in range(len(class_of_all_images)):
         m[paths_of_images[i].split("/")[-1]] = class_of_all_images[i]
-    
-    print(f"during save: {class_of_all_images}")
-    # with open('fundus_data.json', "w+") as f:
     with open('mnist_data.json', "w") as f:
         f.write(json.dumps(m))
+
+    # Q) Which is optimized a new_file your_file.txt and load and read everytime 
+    # or deduce everything from mnist_data.json
+    # Save unseen_idx_set calculated in previous next
+    unseen_idx_set = unseen_idx_set.difference(set(current_24))
+    ssil = list(unseen_idx_set)
+    with open('your_file.txt', 'w') as f:
+        for item in ssil:
+            f.write("%s\n" % item)
     print(c1)
     return ""
 
@@ -124,6 +165,7 @@ def save(c1):
     Input({'type': 'label-option','index': MATCH}, 'id')
 )
 def button_click(value, id):
+    '''What are the states of the radio buttons clicked?'''
     # I ahve the value of the recording here , 
     # Manipulate here and store in a datastructure and fire when save is clicked
     # print(f"val: {value}, id: {id}")
@@ -138,4 +180,4 @@ def button_click(value, id):
 
 
 if __name__ == '__main__':
-    app.run_server(host='127.0.0.1', port=2320 ,debug=True)
+    app.run_server(host='127.0.0.1', port=2420 ,debug=True)
