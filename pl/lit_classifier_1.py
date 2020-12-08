@@ -48,15 +48,13 @@ class MNISTDataModule(pl.LightningDataModule):
 
 # ----------
 class LitClassifier(pl.LightningModule):
-    def __init__(self, batch_size=32):
+    def __init__(self):
         super().__init__()
         self.layer1 = nn.Linear(28*28, 64)
         self.layer2 = nn.Linear(64, 64)
         self.layer3 = nn.Linear(64, 10)
         self.do = nn.Dropout(0.1)
         self.loss = nn.CrossEntropyLoss()
-        self.batch_size = batch_size
-
 
     def forward(self, x):
         h1 = nn.functional.relu(self.layer1(x))
@@ -123,35 +121,6 @@ class LitClassifier(pl.LightningModule):
         return {'val_loss': avg_val_loss, 'progress_bar':pbar} 
     #     # if this is missing it wont go for the other loss, it will just wont early-stop
 
-    def prepare_data(self):
-        # download only
-        datasets.MNIST('data', train=True, download=True, transform=transforms.ToTensor())
-        datasets.MNIST('data', train=False, download=True, transform=transforms.ToTensor())
-
-    def setup(self, stage):
-        # transform
-        transform=transforms.Compose([transforms.ToTensor()])
-        training_dataset = datasets.MNIST('data', train=True, download=False, transform=transform)
-        test_dataset = datasets.MNIST('data', train=False, download=False, transform=transform)
-
-        # train/val split
-        mnist_train, mnist_val = random_split(training_dataset, [55000, 5000])
-
-        # assign to use in dataloaders
-        self.train_dataset = mnist_train
-        self.val_dataset = mnist_val
-        self.test_dataset = test_dataset
-
-    def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.batch_size)
-
-    def val_dataloader(self):
-        return DataLoader(self.val_dataset, batch_size=self.batch_size)
-
-    def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=self.batch_size)
-
-
     # def setup()
 
     # def train_dataloader(self):
@@ -177,9 +146,8 @@ class LitClassifier(pl.LightningModule):
 
 # create model obj
 model = LitClassifier()
-# mnist_dm = MNISTDataModule()
+mnist_dm = MNISTDataModule()
 trainer = pl.Trainer(progress_bar_refresh_rate=20, max_epochs=5,gpus=1) 
-trainer.fit(model)
-# trainer.fit(model, mnist_dm)
+trainer.fit(model, mnist_dm)
 
 
