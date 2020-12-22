@@ -115,9 +115,6 @@ def create_folder(today, name_initials):
 create_folder(today, str(name_initials))
 
 
-def create_file(path):
-    pass
-
 # =============xxxx particular session xxxx============================
 
 
@@ -239,6 +236,7 @@ def card(card_id):
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
 
 app.layout = html.Div([
+    html.Button("Start",    id="start", style={'backgroundColor': "black", "color": "#ffffff", "margin": "20px", "padding": "10px"}),
     html.Button("Load",    id="load", style={'backgroundColor': "green", "color": "#ffffff", "margin": "20px", "padding": "10px"}),
     html.Button("Next",    id="next", style={'backgroundColor': "blue", "color": "white", "margin": "20px", "padding": "10px"}),
     html.Button("Save",    id="save", style={'backgroundColor': "SlateBlue", "color": "white", "margin": "20px", "padding": "10px"}),
