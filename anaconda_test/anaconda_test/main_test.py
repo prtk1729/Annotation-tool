@@ -44,6 +44,7 @@ batch_end_time = 0
 paths_of_images = glob('static/mnist/*.jpg')
 class_of_all_images = [-1]*len(paths_of_images) # stores the class annotations of all the images by initialising -1.s
 glob_idx = [i for i in range(len(paths_of_images))]
+time_logs = []
 
 # ===========global variables==========================
 
@@ -52,10 +53,17 @@ glob_idx = [i for i in range(len(paths_of_images))]
 
 def calculate_ann_time(batch_start_time):
     # calculate batch_end_time, print b/w next time write into file file and return batch end_time
-    
+    global time_logs
+
     batch_end_time = perf_counter()
-    print(batch_end_time - batch_start_time, "\nin SECs\n")
+    # print(batch_end_time - batch_start_time, "\nin SECs\n")
     time_elapsed = batch_end_time - batch_start_time
+    time_logs.append(time_elapsed)
+    path = './StatsIO/{}/{}_{}_{}'.format(name_initials,day, month, year)
+    file_name = "time_logs.json"
+    fp = open(os.path.join(path, file_name), 'w')
+    d = {'time_logs':time_logs}
+    fp.write(json.dumps(d))
 
     return batch_end_time, time_elapsed
 
@@ -77,7 +85,7 @@ print('New Session Resuming from iteration: {}'.format(iter_no))
 
 
 
-# =============record labels/annotations for a particular session per person per day============================
+# =============create folder for a particular session per person per day============================
 name_initials = input("Enter your name initials: ") #Use this to make folders
 today = date.today()
 day, month, year = date.today().day, date.today().month,  date.today().year
@@ -88,7 +96,7 @@ day, month, year = date.today().day, date.today().month,  date.today().year
 #     pass
 
 
-def create_file(today, name_initials):
+def create_folder(today, name_initials):
     # the input files will contain predicted values of 72 images from pool set
     # expected output file will contain actual annotations of converted_train_set
     # file_name_format: {name_initials}_{day}_{month}_{year}_{i/o}.json
@@ -104,15 +112,19 @@ def create_file(today, name_initials):
     except OSError as error:
         print("Directory already present")
 
-create_file(today, str(name_initials))
+create_folder(today, str(name_initials))
+
+
+def create_file(path):
+    pass
 
 # =============xxxx particular session xxxx============================
 
 
 
 
-print(paths_of_images[0])
-print(paths_of_images[0].split("/")[-1])
+# print(paths_of_images[0])
+# print(paths_of_images[0].split("/")[-1])
 
 
 
@@ -286,7 +298,7 @@ def most_confused_24():
     global unseen_idx_set
     global class_of_all_images
 
-#   read file here now I have deterministically (|yesterday_set|//3) idxs Of the "new_indices" put batches of 24 here.
+    # read file here now I have deterministically (|yesterday_set|//3) idxs Of the "new_indices" put batches of 24 here.
     next_24 = list(unseen_idx_set)[:24]
 
 
