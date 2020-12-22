@@ -23,7 +23,8 @@ def check_point():
     return iter_no
 
 iter_no = check_point()
-print(f'Resuming from iteration: {iter_no}')
+print(f'New session Resuming from iteration: {iter_no}')
+# here write Load button logic
 
 
 
@@ -82,13 +83,16 @@ def card_body(card_id):
                 'index': f"{card_id}" #global ids
                 },
                 options=[
+
                     {'label': 'Normal', 'value': f"0"},
                     {'label': 'Grade 1', 'value': f"1"},
                     {'label': 'Grade 2', 'value': f"2"},
-                    {'label': 'Grade 3', 'value': f"3"}
+                    {'label': 'Grade 3', 'value': f"3"},
+                    {'label': 'POOR QUALITY', 'value': f"4"}
+
                 ],
                 value=str(state_24[i]),
-                labelStyle={'display': 'inline-block', "padding": "0px 5px 0px 0px", "margin-bottom": "0px"},
+                labelStyle={'display': 'inline-block', "padding": "0px 5px 0px 2px", "margin-bottom": "1px"},
                 inputStyle = {"margin-right": "2px"},
                 className=""
             )  
@@ -104,7 +108,7 @@ def card(card_id):
     return dbc.Card(card_body(card_id), id={
                 'type': 'card',
                 'index': f"{card_id}" #global ids
-                }, style={"height":"200px", "width": "180px"})
+                }, style={"height":"222px", "width": "180px"})
    
 
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -135,7 +139,7 @@ def predict_next_24_states(next_24):
     placeholders for next set of 24 points.....for now placeholders follow the following logic'''
     global state_24
 
-    state_24 = [le%4 for le in next_24]
+    state_24 = [le%5 for le in next_24]
     # print(f"inside predict_next_24_states() with state_24: {state_24}")
     return state_24
 
@@ -246,4 +250,4 @@ def button_click(value, id):
 
 
 if __name__ == '__main__':
-    app.run_server(host='127.0.0.1', port=6590 ,debug=True)
+    app.run_server(host='127.0.0.1', port=4870 ,debug=True)
