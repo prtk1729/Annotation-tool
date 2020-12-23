@@ -24,7 +24,12 @@ import os
 arg_container = argparse.ArgumentParser(description='Specify the Operating System')
 
 # should be optional arguments container.add_arguments
-arg_container.add_argument('--is_os_win', '-Is_Operating_System_Windows', type=int, required=True, help='Is your OS Windows? (--os True) else False')
+arg_container.add_argument('--is_os_win', '-Is_Operating_System_Windows', type=int, required=True,
+                           help='Is your OS Windows? (--os True) else False')
+
+arg_container.add_argument('--initials', "-Annotator's_name_initials", type=str, required=True,
+                           help='example: if your name is Prateek Pani, type "--initials pp"')
+
 
 # container.parse_args() and store in args
 args = arg_container.parse_args()
@@ -50,8 +55,7 @@ time_logs = []
 
 
 
-
-def calculate_ann_time(batch_start_time):
+def calculate_ann_time(batch_start_time, save_to_disk=False):
     # calculate batch_end_time, print b/w next time write into file file and return batch end_time
     global time_logs
 
@@ -59,11 +63,13 @@ def calculate_ann_time(batch_start_time):
     # print(batch_end_time - batch_start_time, "\nin SECs\n")
     time_elapsed = batch_end_time - batch_start_time
     time_logs.append(time_elapsed)
-    path = './StatsIO/{}/{}_{}_{}'.format(name_initials,day, month, year)
-    file_name = "time_logs.json"
-    fp = open(os.path.join(path, file_name), 'w')
-    d = {'time_logs':time_logs}
-    fp.write(json.dumps(d))
+
+    if save_to_disk == True:
+        path = './StatsIO/{}/{}_{}_{}'.format(name_initials,day, month, year)
+        file_name = "time_logs.json"
+        fp = open(os.path.join(path, file_name), 'w')
+        d = {'time_logs':time_logs}
+        fp.write(json.dumps(d))
 
     return batch_end_time, time_elapsed
 
@@ -86,7 +92,7 @@ print('New Session Resuming from iteration: {}'.format(iter_no))
 
 
 # =============create folder for a particular session per person per day============================
-name_initials = input("Enter your name initials: ") #Use this to make folders
+name_initials = args.initials #Use this to make folders
 today = date.today()
 day, month, year = date.today().day, date.today().month,  date.today().year
 
@@ -239,8 +245,8 @@ app.layout = html.Div([
     html.Button("Start",    id="start", style={'backgroundColor': "black", "color": "#ffffff", "margin": "20px", "padding": "10px"}),
     html.Button("Load",    id="load", style={'backgroundColor': "green", "color": "#ffffff", "margin": "20px", "padding": "10px"}),
     html.Button("Next",    id="next", style={'backgroundColor': "blue", "color": "white", "margin": "20px", "padding": "10px"}),
-    html.Button("Save",    id="save", style={'backgroundColor': "SlateBlue", "color": "white", "margin": "20px", "padding": "10px"}),
-    html.Button("Export",    id="export", style={'backgroundColor': "Tomato", "color": "white", "margin": "20px", "padding": "10px"}),
+    html.Button("Save",   n_clicks=0, id="save", style={'backgroundColor': "SlateBlue", "color": "white", "margin": "20px", "padding": "10px"}),
+    html.Button("Export", value='Export', n_clicks=0,    id="export",  style={'backgroundColor': "Tomato", "color": "white", "margin": "20px", "padding": "10px"}),
     html.Div(id="card-deck"),
     html.H3(id='button-clicks'),
 
@@ -327,7 +333,8 @@ def next(c1):
     global batch_end_time
 
 
-    batch_start_time,time_elapsed = calculate_ann_time(batch_start_time) 
+    # Only save the logs in MM not to disk yet
+    batch_start_time,time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=False)
 
     
 
@@ -367,10 +374,10 @@ def next(c1):
 
 
 @app.callback(
-    Output('save', 'className'),
-    Input("save", "n_clicks")
+    Output(component_id='save', component_property='className'),
+    Input(component_id="save", component_property="n_clicks")
 )
-def save(c1):
+def save(n_clicks):
     '''On Clicking save save (1)recordings into mnist_data.json, 
     (2)save unseen idx already calculated in its next call into your_file.txt'''
 
@@ -387,43 +394,116 @@ def save(c1):
     print(gl_state_24, gl_current_24)
 
     m = {}
-    print(c1)
+    print(n_clicks)
 
 #   modify class_of_all_images before writing
     for i in range(len(gl_current_24)):
         class_of_all_images[gl_current_24[i]] = gl_state_24[i]
 
     # print('\nclass\n',class_of_all_images)
-    
+
+
+    # ======= saving everything in datastructures i.e MM i.e RAM for now as a session is to be treated as an atomic event =================
     req_dict = {f'img_{i}.jpg':class_of_all_images[i] for i in range(len(class_of_all_images)) }
     print('req_dict')
     print('\n',req_dict)
     print('req_dict')
-    # Save recordings
-    # for i in range(len(class_of_all_images)):
-    #     m[paths_of_images[i].split("/")[-1]] = class_of_all_images[i]
 
-    # print('\nm\n',m)
-    # print('json',m)
+    unseen_idx_set = unseen_idx_set.difference(set(current_24))
+    ssil = list(unseen_idx_set)
 
+    # =======================================================================================================================================
+
+
+    # ================ saving everything in secondary memory (Disk) ==========================================================================
+    # # create a dict1 and dump here. How to create idx from class_of_all_images and from index we know the img_name?
+    # with open('mnist_data.json', "w") as f:
+    #     f.write(json.dumps(req_dict))
+    #
+    # # Q) Which is optimized a new_file your_file.txt and load and read everytime
+    # # or deduce everything from mnist_data.json
+    # # Save unseen_idx_set calculated in previous next
+    #
+    # with open('your_file.txt', 'w') as f:
+    #     for item in ssil:
+    #         f.write("%s\n" % item)
+    #
+    # # write next iteration number onto last_checkpoint file
+    # iter_no += 1
+    # file1 = open("./last_checkpoint.txt","w")
+    # file1.write('{}'.format(str(iter_no)))
+    # file1.close()
+
+    # ==========================================================================================================================================
+
+    print('\nEOSAVE')
+    # print(c1)
+    return ""
+
+
+@app.callback(
+    Output(component_id='export', component_property='className'),
+    Input(component_id="export", component_property="n_clicks")
+)
+def stop_session(n_clicks):
+    '''On Clicking save save (1)recordings into mnist_data.json,
+    (2)save unseen idx already calculated in its next call into your_file.txt'''
+    global batch_start_time
+
+    batch_start_time,time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=True)
+
+    global iter_no
+    global class_of_all_images
+    global unseen_idx_set
+    global state_24
+    global current_24
+    global gl_state_24
+    global gl_current_24
+
+    current_24 = list(unseen_idx_set)[:24]
+    print('\nInside save()\n')
+    print(gl_state_24, gl_current_24)
+
+    m = {}
+    print(n_clicks)
+
+    #   modify class_of_all_images before writing
+    for i in range(len(gl_current_24)):
+        class_of_all_images[gl_current_24[i]] = gl_state_24[i]
+
+    # print('\nclass\n',class_of_all_images)
+
+    # ======= saving everything in datastructures i.e MM i.e RAM for now as a session is to be treated as an atomic event =================
+    req_dict = {f'img_{i}.jpg': class_of_all_images[i] for i in range(len(class_of_all_images))}
+    print('req_dict')
+    print('\n', req_dict)
+    print('req_dict')
+
+    unseen_idx_set = unseen_idx_set.difference(set(current_24))
+    ssil = list(unseen_idx_set)
+
+    # =======================================================================================================================================
+
+    # ================ saving everything in secondary memory (Disk) ==========================================================================
     # create a dict1 and dump here. How to create idx from class_of_all_images and from index we know the img_name?
     with open('mnist_data.json', "w") as f:
         f.write(json.dumps(req_dict))
 
-    # Q) Which is optimized a new_file your_file.txt and load and read everytime 
+    # Q) Which is optimized a new_file your_file.txt and load and read everytime
     # or deduce everything from mnist_data.json
     # Save unseen_idx_set calculated in previous next
-    unseen_idx_set = unseen_idx_set.difference(set(current_24))
-    ssil = list(unseen_idx_set)
+
     with open('your_file.txt', 'w') as f:
         for item in ssil:
             f.write("%s\n" % item)
 
     # write next iteration number onto last_checkpoint file
     iter_no += 1
-    file1 = open("./last_checkpoint.txt","w") 
+    file1 = open("./last_checkpoint.txt", "w")
     file1.write('{}'.format(str(iter_no)))
     file1.close()
+
+    # ==========================================================================================================================================
 
     print('\nEOSAVE')
     # print(c1)
