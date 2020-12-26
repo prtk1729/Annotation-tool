@@ -21,6 +21,11 @@ A tool to annotate images in a large dataset efficiently by incorporating Machin
 * Type 'python main.py --is_os_win 1' for Windows users and for non-Windows-users type 'python main.py --is_os_win 0'.
 * Copy everything after 'Dash is running on' say (http://127.0.0.1:7236) and open a new browser tab (say Chrome/Mozilla etc) and paste in the URL field of the tab.
 
+# Running the dash after cloning the repo:
+* Create a new folder 'ann_tool' (say).
+* Clone the repo: 
+*
+
 # Running everytime after first time
 * Open the folder containing the anaconda_zip file i.e ~/Downloads/anaconda_test.
 * Click 'Shift+Right Click' this anaconda_test and click 'Open command window here' which open the command prompt.
