@@ -566,6 +566,11 @@ def button_click(value, id):
 
 if __name__ == '__main__':
     port = random.randrange(2000, 7999)
+    # during development
+    # app.run_server(host='127.0.0.1', port=port, debug=True)
+
+
+    # for testing
     app.run_server(host='127.0.0.1', port=port, debug=False)
 
 
