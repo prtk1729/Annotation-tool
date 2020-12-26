@@ -9,7 +9,7 @@ A tool to annotate images in a large dataset efficiently by incorporating Machin
 
 # Running the tool after cloning the repo (Refer, only during testing phase with Girish sir and Garima):
 * Create a new folder <ann_tool> (say).
-* Clone the repo: https://github.com/prtk1729/Annotation-Tool.git
+* Clone the repo: "git clone https://github.com/prtk1729/Annotation-Tool.git" inside the above created folder.
 * Once the repo is cloned navigate to - <ann_tool>/Annotation-Tool/anaconda/anaconda
 * Activate a venv/ a conda environment with (python 3.6 or higher) and type "pip install -r requirements.txt".Alternatively, We could simply type this command if we have pip installed with (python 3.6 or higher) without creating a new environment.
 * Once the necessary dependencies are installed we could type "python/python3 main.py --is_os_win 1 --initials pp. Note, we set the --is_os_win to '1'(if running on Windows OS) else use --is_os_win 0 (for Non-Win OS) and set the --initials flag to 'pp' (If the name of the Annotator is "Prateek Pani" say).
