@@ -11,7 +11,7 @@ A tool to annotate images in a large dataset efficiently by incorporating Machin
 * Create a new folder <ann_tool> (say).
 * Clone the repo: https://github.com/prtk1729/Annotation-Tool.git
 * Once the repo is cloned navigate to - <ann_tool>/Annotation-Tool/anaconda/anaconda
-* activate a venv/ a conda environment with (python 3.6 or higher) and type "pip install -r requirements.txt".Alternatively, We could simply type this command if we have pip installed with (python 3.6 or higher) without creating a new environment.
+* Activate a venv/ a conda environment with (python 3.6 or higher) and type "pip install -r requirements.txt".Alternatively, We could simply type this command if we have pip installed with (python 3.6 or higher) without creating a new environment.
 * Once the necessary dependencies are installed we could type "python/python3 main.py --is_os_win 1 --initials pp. Note, we set the --is_os_win to '1'(if running on Windows OS) else use --is_os_win 0 (for Non-Win OS) and set the --initials flag to 'pp' (If the name of the Annotator is "Prateek Pani" say).
 * Copy everything after 'Dash is running on' say (http://127.0.0.1:7236) and open a new browser tab (say Chrome/Mozilla etc) and paste in the URL field of the tab.
 * The browser tab will show only 3 buttons 'Next', 'Save', 'Export' and nothing else.
