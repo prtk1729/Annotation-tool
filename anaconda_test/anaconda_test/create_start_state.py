@@ -43,7 +43,8 @@ def reset_json_file():
             else:
                 gn_list.extend(pool_idx_list[ (i*200+(digit*600)) : ((i+1)*200+(digit*600)) ])
 
-    pp_dict = {f"img_{int(le)}.jpg": 0 for le in pp_list}
+    # pp_dict = {f"img_{int(le)}.jpg": 0 for le in pp_list}
+    pp_dict = {f"img_{int(le)}.jpg": int(le)%5 for le in pp_list}
     gv_dict = {f"img_{int(le)}.jpg": 0 for le in gv_list}
     gn_dict = {f"img_{int(le)}.jpg": 0 for le in gn_list}
 
