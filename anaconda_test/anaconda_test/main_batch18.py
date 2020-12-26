@@ -14,6 +14,9 @@ import sys
 from time import perf_counter
 from datetime import date
 import os
+import signal
+
+
 
 paths_of_images = glob('static/pool_Set/*.jpg')
 class_of_all_images = [-1] * len(paths_of_images)  # stores the class annotations of all the images by initialising -1.s
@@ -154,16 +157,27 @@ def read_json(today):
             # with open('fundus_data.json',mode='r') as f:
             m = json.loads(f.read())
             # print(m)
-            for le in pp_list:
-                class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
+            if args.initials == 'pp':
+                for le in pp_list:
+                    class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
+            elif args.initials == 'gv':
+                for le in gv_list:
+                    class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
+            elif args.initials == 'gn':
+                for le in gn_list:
+                    class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
+            else:
+                raise KeyboardInterrupt
+
 
     else:
         with open(f"StatsIO\\{args.initials}\\{day}_{month}_{year}\\yest_inp_file.json", 'r') as f:  # change here only for the initials from folder @every start of session
             # with open('fundus_data.json',mode='r') as f:
             m = json.loads(f.read())
             # print(m)
-            for le in pp_list:
-                class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
+            if args.initials == 'pp':
+                for le in pp_list:
+                    class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
 
 
 read_json(today)
@@ -473,11 +487,11 @@ def save(n_clicks):
 
 @app.callback(
     Output(component_id='export', component_property='className'),
-    Input(component_id="export", component_property="n_clicks")
+    Input(component_id="export", component_property="n_clicks"),
+    prevent_initial_call = True
 )
 def stop_session(n_clicks):
-    '''On Clicking save save (1)recordings into mnist_data.json,
-    (2)save unseen idx already calculated in its next call into your_file.txt'''
+    '''Only on clicking i.e n_clicks>=1 export button would work not from starting when the app runs'''
     global batch_start_time
 
     batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=True)
@@ -544,10 +558,10 @@ def stop_session(n_clicks):
     file1.write('{}'.format(str(iter_no)))
     file1.close()
 
+    print('SESSION COMPLETE!!')
+    os.kill(os.getpid(), signal.SIGTERM)
     # ==========================================================================================================================================
     # create_annotated_today_file()
-
-    print('\nSTOP_SESSION')
     # print(c1)
     return ""
 
