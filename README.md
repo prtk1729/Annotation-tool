@@ -19,7 +19,7 @@ A tool to annotate images in a large dataset efficiently by incorporating Machin
 * The images are displayed with placeholder-values on the radio-values as predicted by the Acquisition Function, the night before.
 * Once the annotator annotates all the images in a particular batch. he/she can click 'Save' then 'Next'.
 * Continue with the above two steps until you want to end the session.
-* In the last batch, click the 'Export' button to save all the annotations made by the annotator in a file (StatsIO/<initials>/<today's_date>/mnist_uptil_today_out_files.json). And the time taken between every two consecutive 'Next' clicks in the file (StatsIO/<initials>/<today's_date>/time_logs.json).
+* When one wants to end the session, click the 'Export' button to save all the annotations made by the annotator in a file (StatsIO/<initials>/<today's_date>/mnist_uptil_today_out_files.json). And the time taken between every two consecutive 'Next' clicks in the file (StatsIO/<initials>/<today's_date>/time_logs.json).
 * The annotator need to just copy the entire folder (StatsIO/<initials>/<today's_date>  for e.g StatsIO/pp/26_12_2020) after he/she is done with the annotation process and paste in the SharePoint after navigating to /ML for Med/Annotation_Tool/<gv or gn or pp> or Drag and drop here. 
 
 
