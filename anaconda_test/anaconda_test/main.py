@@ -93,6 +93,7 @@ today = date.today()
 day, month, year = date.today().day, date.today().month, date.today().year
 
 def create_folder(today, name_initials):
+    '''Should create a folder if not present and if present print'''
     day, month, year = today.day, today.month, today.year
     if args.is_os_win == 0:
         path = './StatsIO/{}/{}_{}_{}'.format(name_initials, day, month, year)

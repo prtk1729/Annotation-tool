@@ -66,13 +66,13 @@ def calculate_ann_time(batch_start_time, save_to_disk=False):
 
     if save_to_disk == True:
         if args.is_os_win == 0:
-            path = './StatsIO/{}/{}_{}_{}'.format(name_initials, day, month, year)
+            path = './StatsIO/{}/{}_{}_{}'.format(name_initials, day+1, month, year)
             file_name = "time_logs.json"
             fp = open(os.path.join(path, file_name), 'w')
             d = {'time_logs': time_logs}
             fp.write(json.dumps(d))
         else:
-            path = '.\\StatsIO\\{}\\{}_{}_{}'.format(name_initials, day, month, year)
+            path = '.\\StatsIO\\{}\\{}_{}_{}'.format(name_initials, day+1, month, year)
             file_name = "time_logs.json"
             fp = open(os.path.join(path, file_name), 'w')
             d = {'time_logs': time_logs}
@@ -113,9 +113,9 @@ def create_folder(today, name_initials):
     # file_name_format: {name_initials}_{day}_{month}_{year}_{i/o}.json
     day, month, year = today.day, today.month, today.year
     if args.is_os_win == 0:
-        path = './StatsIO/{}/{}_{}_{}'.format(name_initials, day, month, year)
+        path = './StatsIO/{}/{}_{}_{}'.format(name_initials, day+1, month, year)
     else:
-        path = '.\\StatsIO\\{}\\{}_{}_{}'.format(name_initials, day, month, year)
+        path = '.\\StatsIO\\{}\\{}_{}_{}'.format(name_initials, day+1, month, year)
     # os.makedirs(path)
     try:
         os.makedirs(path)
@@ -153,7 +153,7 @@ def read_json(today):
                 gn_list.extend(pool_idx_list[(i * 200 + (digit * 600)): ((i + 1) * 200 + (digit * 600))])
 
     if args.is_os_win == 0:
-        with open(f"StatsIO/{args.initials}/{day}_{month}_{year}/yest_inp_file.json", 'r') as f:  # change here only for the initials from folder @every start of session
+        with open(f"StatsIO/{args.initials}/{day+1}_{month}_{year}/yest_inp_file.json", 'r') as f:  # change here only for the initials from folder @every start of session
             # with open('fundus_data.json',mode='r') as f:
             m = json.loads(f.read())
             # print(m)
@@ -171,7 +171,7 @@ def read_json(today):
 
 
     else:
-        with open(f"StatsIO\\{args.initials}\\{day}_{month}_{year}\\yest_inp_file.json", 'r') as f:  # change here only for the initials from folder @every start of session
+        with open(f"StatsIO\\{args.initials}\\{day+1}_{month}_{year}\\yest_inp_file.json", 'r') as f:  # change here only for the initials from folder @every start of session
             # with open('fundus_data.json',mode='r') as f:
             m = json.loads(f.read())
             # print(m)
@@ -181,24 +181,6 @@ def read_json(today):
 
 
 read_json(today)
-# print(f'\nread_json: {class_of_all_images[:50]}\n')
-
-    # global class_of_all_images
-    # with open(f"StatsIO/{args.initials}/25_12_2020/yest_inp_file.json", 'r') as f: #change here only for the initials from folder @every start of session
-    #     # with open('fundus_data.json','r') as f:
-    #     m = json.loads(f.read())
-    #     if args.is_os_win:
-    #         for i in range(len(paths_of_images)):
-    #             class_of_all_images[i] = m[paths_of_images[i].split("\\")[-1]]
-    #     else:
-    #         for i in range(len(paths_of_images)):
-    #             class_of_all_images[i] = m[paths_of_images[i].split("/")[-1]]
-
-# read_json()
-# print(class_of_all_images) #states of all the images uptil this point.
-
-
-# req_dict = {le: '-1' for le in paths_of_images}  # for this load dict
 
 
 # start of session reads from your_file.txt for unseen_idx_set
@@ -607,11 +589,11 @@ def stop_session(n_clicks):
 
     # ======== save o/p files ===============================
     if args.is_os_win == 0:
-        with open(file='./StatsIO/{}/{}_{}_{}/mnist_uptil_today_out_files.json'.format(name_initials, day, month, year),  mode="w") as f:
+        with open(file='./StatsIO/{}/{}_{}_{}/mnist_uptil_today_out_files.json'.format(name_initials, day+1, month, year),  mode="w") as f:
             f.write(json.dumps(req_dict))
 
     else:
-        with open(file='.\\StatsIO\\{}\\{}_{}_{}/mnist_uptil_today_out_files.json'.format(name_initials, day, month, year),  mode="w") as f:
+        with open(file='.\\StatsIO\\{}\\{}_{}_{}/mnist_uptil_today_out_files.json'.format(name_initials, day+1, month, year),  mode="w") as f:
             f.write(json.dumps(req_dict))
 
 
@@ -666,6 +648,7 @@ def button_click(value, id):
 
 if __name__ == '__main__':
     port = random.randrange(2000, 7999)
-    app.run_server(host='127.0.0.1', port=port, debug=True)
+    # app.run_server(host='127.0.0.1', port=port, debug=True) #when developing
+    app.run_server(host='127.0.0.1', port=port, debug=False)
 
 
