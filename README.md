@@ -20,7 +20,7 @@ A tool to annotate images in a large dataset efficiently by incorporating Machin
 * Once the annotator annotates all the images in a particular batch. he/she can click 'Save' then 'Next'.
 * Continue with the above two steps until you want to end the session.
 * In the last batch, click the 'Export' button to save all the annotations made by the annotator in a file (StatsIO/<initials>/<today's_date>/mnist_uptil_today_out_files.json). And the time taken between every two consecutive 'Next' clicks in the file (StatsIO/<initials>/<today's_date>/time_logs.json).
-* The annotator need to just copy the entire folder(StatsIO/<initials>/<today's_date>) not the files one by one in the SharedPoint or push the files in this folder via git aa, commit, push whichever is preferable.
+* The annotator need to just copy the entire folder(StatsIO/<initials>/<today's_date>) in the SharedPoint or push the files in this folder via git add, commit, push  whichever is preferable among the above two methods.
 
 
 
