@@ -8,12 +8,18 @@ import random
 from glob import glob
 import json
 import argparse
-from create_start_state import reset_json_file
+# from create_start_state import reset_json_file
 import random
 import sys
 from time import perf_counter
 from datetime import date
 import os
+import signal
+
+
+
+paths_of_images = glob('static/pool_Set/*.jpg')
+class_of_all_images = [-1] * len(paths_of_images)  # stores the class annotations of all the images by initialising -1.s
 
 # =========CLI Parsing===============
 arg_container = argparse.ArgumentParser(description='Specify the Operating System')
@@ -37,11 +43,11 @@ unseen_idx_list = []
 gl_state_18 = []
 gl_current_18 = []
 state_18 = []
+current_18 = []
 # session_start_time = 0
 batch_start_time = 0
 batch_end_time = 0
-paths_of_images = glob('static/mnist/*.jpg') #change this to connect
-class_of_all_images = [-1] * len(paths_of_images)  # stores the class annotations of all the images by initialising -1.s
+# paths_of_images = glob('static/mnist/*.jpg') #change this according to args.initials
 glob_idx = [i for i in range(len(paths_of_images))]
 time_logs = []
 
@@ -59,18 +65,26 @@ def calculate_ann_time(batch_start_time, save_to_disk=False):
     time_logs.append(time_elapsed)
 
     if save_to_disk == True:
-        path = './StatsIO/{}/{}_{}_{}'.format(name_initials, day, month, year)
-        file_name = "time_logs.json"
-        fp = open(os.path.join(path, file_name), 'w')
-        d = {'time_logs': time_logs}
-        fp.write(json.dumps(d))
+        if args.is_os_win == 0:
+            path = './StatsIO/{}/{}_{}_{}'.format(name_initials, day, month, year)
+            file_name = "time_logs.json"
+            fp = open(os.path.join(path, file_name), 'w')
+            d = {'time_logs': time_logs}
+            fp.write(json.dumps(d))
+        else:
+            path = '.\\StatsIO\\{}\\{}_{}_{}'.format(name_initials, day, month, year)
+            file_name = "time_logs.json"
+            fp = open(os.path.join(path, file_name), 'w')
+            d = {'time_logs': time_logs}
+            fp.write(json.dumps(d))
+
 
     return batch_end_time, time_elapsed
 
 
 def check_point():
     '''function reads the last_checkpoint file and returns the current iter_no'''
-    with open('./last_checkpoint.txt') as lc:
+    with open(f'last_checkpoint_{args.initials}.txt') as lc:
         iter_no = lc.read()
     lc.close()
     iter_no = int(iter_no)
@@ -101,7 +115,7 @@ def create_folder(today, name_initials):
     if args.is_os_win == 0:
         path = './StatsIO/{}/{}_{}_{}'.format(name_initials, day, month, year)
     else:
-        path = '.\\StatsIO\\{}/{}_{}_{}'.format(name_initials, day, month, year)
+        path = '.\\StatsIO\\{}\\{}_{}_{}'.format(name_initials, day, month, year)
     # os.makedirs(path)
     try:
         os.makedirs(path)
@@ -121,30 +135,70 @@ create_folder(today, str(name_initials))
 
 
 # data retrieval for states
-def read_json():
+def read_json(today):
     global class_of_all_images
-    with open('mnist_data.json', 'r') as f: #corresponding initials_yest file
-        # with open('fundus_data.json','r') as f:
-        m = json.loads(f.read())
-        if args.is_os_win:
-            for i in range(len(paths_of_images)):
-                class_of_all_images[i] = m[paths_of_images[i].split("\\")[-1]]
-        else:
-            for i in range(len(paths_of_images)):
-                class_of_all_images[i] = m[paths_of_images[i].split("/")[-1]]
+    global paths_of_images
+    day, month, year = today.day, today.month, today.year
+
+    pool_idx_list = list(range(len(paths_of_images)))
+    gn_list, pp_list, gv_list = [], [], []
+    pp_dict, gn_dict, gv_dict = {}, {}, {}
+    for digit in range(5):
+        for i in range(3):
+            if i == 0:
+                pp_list.extend(pool_idx_list[(i * 200 + (digit * 600)): ((i + 1) * 200 + (digit * 600))])
+            elif i == 1:
+                gv_list.extend(pool_idx_list[(i * 200 + (digit * 600)): ((i + 1) * 200 + (digit * 600))])
+            else:
+                gn_list.extend(pool_idx_list[(i * 200 + (digit * 600)): ((i + 1) * 200 + (digit * 600))])
+
+    if args.is_os_win == 0:
+        with open(f"StatsIO/{args.initials}/{day}_{month}_{year}/yest_inp_file.json", 'r') as f:  # change here only for the initials from folder @every start of session
+            # with open('fundus_data.json',mode='r') as f:
+            m = json.loads(f.read())
+            # print(m)
+            if args.initials == 'pp':
+                for le in pp_list:
+                    class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
+            elif args.initials == 'gv':
+                for le in gv_list:
+                    class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
+            elif args.initials == 'gn':
+                for le in gn_list:
+                    class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
+            else:
+                raise KeyboardInterrupt
 
 
+    else:
+        with open(f"StatsIO\\{args.initials}\\{day}_{month}_{year}\\yest_inp_file.json", 'r') as f:  # change here only for the initials from folder @every start of session
+            # with open('fundus_data.json',mode='r') as f:
+            m = json.loads(f.read())
+            # print(m)
+            if args.initials == 'pp':
+                for le in pp_list:
+                    class_of_all_images[int(le)] = int(m[f'img_{le}.jpg'])
+
+
+read_json(today)
+# print(f'\nread_json: {class_of_all_images[:50]}\n')
+
+    # global class_of_all_images
+    # with open(f"StatsIO/{args.initials}/25_12_2020/yest_inp_file.json", 'r') as f: #change here only for the initials from folder @every start of session
+    #     # with open('fundus_data.json','r') as f:
+    #     m = json.loads(f.read())
+    #     if args.is_os_win:
+    #         for i in range(len(paths_of_images)):
+    #             class_of_all_images[i] = m[paths_of_images[i].split("\\")[-1]]
+    #     else:
+    #         for i in range(len(paths_of_images)):
+    #             class_of_all_images[i] = m[paths_of_images[i].split("/")[-1]]
+
+# read_json()
 # print(class_of_all_images) #states of all the images uptil this point.
 
 
-req_dict = {le: '-1' for le in paths_of_images}  # for this load dict
-
-# ================ start timer after asking for a_name =======================================================
-# ============ Just after preprocessing and just before start_new_session() ==========
-batch_start_time = perf_counter()
-
-
-# ====================================================================================
+# req_dict = {le: '-1' for le in paths_of_images}  # for this load dict
 
 
 # start of session reads from your_file.txt for unseen_idx_set
@@ -154,7 +208,7 @@ def start_new_session():
     global unseen_idx_list
     global session_start_time
 
-    my_file = open("your_file.txt", "r")
+    my_file = open(f"your_file_{args.initials}.txt", "r")
     content = my_file.read()
     if len(list(content)) == 0:
         # handle case when iter_no != 0 and len(list(content)) == 0: inconsistent case return with prompt.
@@ -171,6 +225,19 @@ def start_new_session():
 start_new_session()
 
 
+
+
+# # ============ Just after preprocessing and just before start_new_session() ==========
+# batch_start_time = perf_counter()
+# ====================================================================================
+
+
+
+# ======================================================================= dash app ====================================
+# ========================================================================================================================================================================
+
+
+# ============ In card_body() we initialize the placeholder values from the previous_day json-file ================
 def card_body(card_id):
     global current_18
     global state_18
@@ -180,8 +247,10 @@ def card_body(card_id):
     for i in range(len(current_18)):
         if current_18[i] == card_id:
             break
-    # print(current_24[i])
-    # print(state_24[i])
+    # print(card_id)
+    # state_18[i] = 0
+    # print(current_18[i])
+    # print(state_18[i])
     # print(f'\nInside card_body() {str(state_24[i])}\n')
 
     # class_of_all_images[current_24[i]] = state_24[i]
@@ -284,8 +353,9 @@ def predict_next_18_states(next_18):
     Here, I already have 18_predicted states predicted by model "yesterday" in yesterday_file. Just read the file and
     associate |yesterday_set|//3 inp-labels.json and assign to state_18'''
     global state_18
+    global class_of_all_images
 
-    state_18 = [le % 5 for le in next_18]
+    state_18 = [class_of_all_images[int(le)] for le in next_18]
     # print(f"inside predict_next_18_states() with state_18: {state_18}")
     return state_18
 
@@ -311,10 +381,77 @@ def most_confused_18():
 
     return next_18
 
+# @app.callback(
+#     Output('load', 'children'),
+#     Input("load", "n_clicks"),
+#     prevent_initial_call=True
+#
+# )
+# def load(c1):
+#     '''calculates next set of 18 indices and assigns placeholders to these before loading
+#     invoke most_confused_18 and then predict_next_18_states'''
+#     global class_of_all_images
+#     global unseen_idx_set
+#     global current_18
+#     global state_18
+#     global iter_no
+#     global paths_of_images
+#     global batch_start_time
+#     global batch_end_time
+#
+#     batch_start_time = perf_counter()
+#
+#     # Only save the logs in MM not to disk yet
+#     # batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=False)
+#
+#     # check iter_no
+#     if int(iter_no) >= ((1000 // 18) + 1):
+#         sys.exit()
+#         # resets to start_state
+#         file1 = open(f"last_checkpoint_{args.initials}.txt", "w")
+#         file1.write('0')
+#         file1.close()
+#         print("\nlast_checkpoint file reset to 0. Do a reality check\n")
+#
+#         # before reseting mnist_json/fundus_json files 1st copy the recordings to another file
+#         with open("mnist_data.json", "r") as f1, open("previous_recordings.json", "w") as f2:
+#             f2.write(f1.read())
+#         reset_json_file(args.is_os_win)
+#         print("\n\n\n ======= No more images to be parsed. Stop the session to start from scratch again. \n\n\n")
+#
+#         unseen_idx_set = set([i for i in range(len(paths_of_images))])
+#
+#         # ======= reading the mnist_data.json file updated the previous day for this person ====================
+#         read_json() #modifies class_of_all_images globally
+#         # =======================================================================================================
+#
+#
+#         iter_no = check_point()
+#         print('New Session Resuming from iteration: {}'.format(iter_no))
+#
+#         start_new_session()
+#
+#         current_18 = most_confused_18()
+#         # print('inside next current_24: ', current_24)
+#         state_18 = predict_next_18_states(current_18)
+#
+#     else:
+#         # no need to read from your_file.txt
+#         current_18 = most_confused_18()  # next_24 will be current_24 for next iter
+#         # print(f"inside next() with current_24: {current_24}")
+#         state_18 = predict_next_18_states(current_18)  # returned state list of these current_24 points
+#         # print(f"inside next() with state_24: {state_24}")
+#
+#     return gen_cards(current_18)
+
+
+
 
 @app.callback(
     Output('card-deck', 'children'),
-    Input("next", "n_clicks")
+    Input("next", "n_clicks"),
+    prevent_initial_call=True
+
 )
 def next(c1):
     '''calculates next set of 18 indices and assigns placeholders to these before loading
@@ -329,12 +466,13 @@ def next(c1):
     global batch_end_time
 
     # Only save the logs in MM not to disk yet
-    batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=False)
+    batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=True)
 
     # check iter_no
-    if int(iter_no) >= (len(paths_of_images) // 18 + 1):
+    if int(iter_no) >= ((1000 // 18) + 1):
+        sys.exit()
         # resets to start_state
-        file1 = open("./last_checkpoint.txt", "w")
+        file1 = open(f"last_checkpoint_{args.initials}.txt", "w")
         file1.write('0')
         file1.close()
         print("\nlast_checkpoint file reset to 0. Do a reality check\n")
@@ -346,7 +484,12 @@ def next(c1):
         print("\n\n\n ======= No more images to be parsed. Stop the session to start from scratch again. \n\n\n")
 
         unseen_idx_set = set([i for i in range(len(paths_of_images))])
-        read_json()
+
+        # ======= reading the mnist_data.json file updated the previous day for this person ====================
+        read_json() #modifies class_of_all_images globally
+        # =======================================================================================================
+
+
         iter_no = check_point()
         print('New Session Resuming from iteration: {}'.format(iter_no))
 
@@ -368,7 +511,8 @@ def next(c1):
 
 @app.callback(
     Output(component_id='save', component_property='className'),
-    Input(component_id="save", component_property="n_clicks")
+    Input(component_id="save", component_property="n_clicks"),
+    prevent_initial_call=True
 )
 def save(n_clicks):
     '''On Clicking save save (1)recordings into mnist_data.json,
@@ -383,11 +527,11 @@ def save(n_clicks):
     global gl_current_18
 
     current_18 = list(unseen_idx_set)[:18]
-    print('\nInside save()\n')
-    print(gl_state_18, gl_current_18)
+    # print('\nInside save()\n')
+    # print(gl_state_18, gl_current_18)
 
     m = {}
-    print(n_clicks)
+    # print(n_clicks)
 
     #   modify class_of_all_images before writing
     for i in range(len(gl_current_18)):
@@ -397,35 +541,12 @@ def save(n_clicks):
 
     # ======= saving everything in datastructures i.e MM i.e RAM for now as a session is to be treated as an atomic event =================
     req_dict = {f'img_{i}.jpg': class_of_all_images[i] for i in range(len(class_of_all_images))}
-    print('req_dict')
-    print('\n', req_dict)
-    print('req_dict')
+    # print('req_dict')
+    # print('\n', req_dict)
+    # print('req_dict')
 
     unseen_idx_set = unseen_idx_set.difference(set(current_18))
     ssil = list(unseen_idx_set)
-
-    # =======================================================================================================================================
-
-    # ================ saving everything in secondary memory (Disk) ==========================================================================
-    # # create a dict1 and dump here. How to create idx from class_of_all_images and from index we know the img_name?
-    # with open('mnist_data.json', "w") as f:
-    #     f.write(json.dumps(req_dict))
-    #
-    # # Q) Which is optimized a new_file your_file.txt and load and read everytime
-    # # or deduce everything from mnist_data.json
-    # # Save unseen_idx_set calculated in previous next
-    #
-    # with open('your_file.txt', 'w') as f:
-    #     for item in ssil:
-    #         f.write("%s\n" % item)
-    #
-    # # write next iteration number onto last_checkpoint file
-    # iter_no += 1
-    # file1 = open("./last_checkpoint.txt","w")
-    # file1.write('{}'.format(str(iter_no)))
-    # file1.close()
-
-    # ==========================================================================================================================================
 
     print('\nEOSAVE')
     # print(c1)
@@ -434,11 +555,11 @@ def save(n_clicks):
 
 @app.callback(
     Output(component_id='export', component_property='className'),
-    Input(component_id="export", component_property="n_clicks")
+    Input(component_id="export", component_property="n_clicks"),
+    prevent_initial_call = True
 )
 def stop_session(n_clicks):
-    '''On Clicking save save (1)recordings into mnist_data.json,
-    (2)save unseen idx already calculated in its next call into your_file.txt'''
+    '''Only on clicking i.e n_clicks>=1 export button would work not from starting when the app runs'''
     global batch_start_time
 
     batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=True)
@@ -450,13 +571,16 @@ def stop_session(n_clicks):
     global current_18
     global gl_state_18
     global gl_current_18
+    global name_initials
+    global today
 
+    day, month, year = today.day, today.month, today.year
     current_18 = list(unseen_idx_set)[:18]
-    print('\nInside save()\n')
-    print(gl_state_18, gl_current_18)
+    # print('\nInside save()\n')
+    # print(gl_state_18, gl_current_18)
 
     m = {}
-    print(n_clicks)
+    # print(n_clicks)
 
     #   modify class_of_all_images before writing
     for i in range(len(gl_current_18)):
@@ -466,37 +590,46 @@ def stop_session(n_clicks):
 
     # ======= saving everything in datastructures i.e MM i.e RAM for now as a session is to be treated as an atomic event =================
     req_dict = {f'img_{i}.jpg': class_of_all_images[i] for i in range(len(class_of_all_images))}
-    print('req_dict')
-    print('\n', req_dict)
-    print('req_dict')
+    # print('req_dict')
+    # print('\n', req_dict)
+    # print('req_dict')
 
     unseen_idx_set = unseen_idx_set.difference(set(current_18))
     ssil = list(unseen_idx_set)
 
+    # with open('mnist_data.json', "w") as f:
+    #     f.write(json.dumps(req_dict))
+
     # =======================================================================================================================================
 
-    # ================ saving everything in secondary memory (Disk) ==========================================================================
+    # ================ saving everything in secondary memory (Disk) at StatsIO/{initials}/{day_month_year} ==========================================================================
     # create a dict1 and dump here. How to create idx from class_of_all_images and from index we know the img_name?
-    with open('mnist_data.json', "w") as f:
-        f.write(json.dumps(req_dict))
 
-    # Q) Which is optimized a new_file your_file.txt and load and read everytime
-    # or deduce everything from mnist_data.json
-    # Save unseen_idx_set calculated in previous next
+    # ======== save o/p files ===============================
+    if args.is_os_win == 0:
+        with open(file='./StatsIO/{}/{}_{}_{}/mnist_uptil_today_out_files.json'.format(name_initials, day, month, year),  mode="w") as f:
+            f.write(json.dumps(req_dict))
 
-    with open('your_file.txt', 'w') as f:
+    else:
+        with open(file='.\\StatsIO\\{}\\{}_{}_{}/mnist_uptil_today_out_files.json'.format(name_initials, day, month, year),  mode="w") as f:
+            f.write(json.dumps(req_dict))
+
+
+    # save the idx_unseen uptil now
+    with open(f'your_file_{args.initials}.txt', 'w') as f:
         for item in ssil:
             f.write("%s\n" % item)
 
-    # write next iteration number onto last_checkpoint file
+    # save the last_checkpoint for this user so as to start from correct point the next time
     iter_no += 1
-    file1 = open("./last_checkpoint.txt", "w")
+    file1 = open(f"last_checkpoint_{args.initials}.txt", "w")
     file1.write('{}'.format(str(iter_no)))
     file1.close()
 
+    print('SESSION COMPLETE!!')
+    os.kill(os.getpid(), signal.SIGTERM)
     # ==========================================================================================================================================
-
-    print('\nEOSAVE')
+    # create_annotated_today_file()
     # print(c1)
     return ""
 
@@ -519,7 +652,7 @@ def button_click(value, id):
     class_of_all_images[int(id['index'])] = int(value)
     # req_dict[ int(id['index']
     print("class of {} set to {}".format(id['index'], value))
-    print(f"class_of_all_images[{int(id['index'])}]", class_of_all_images[int(id['index'])])
+    # print(f"class_of_all_images[{int(id['index'])}]", class_of_all_images[int(id['index'])])
 
     for i in range(len(current_18)):
         if int(current_18[i]) == int(id['index']):

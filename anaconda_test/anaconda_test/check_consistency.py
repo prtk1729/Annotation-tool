@@ -6,3 +6,5 @@ with open('./mnist_data.json', 'r') as f:
 
 with open('./last_checkpoint.txt', 'r') as lc:
     print(lc.read())
+
+# with open

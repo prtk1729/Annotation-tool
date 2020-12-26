@@ -181,25 +181,6 @@ def read_json(today):
 
 
 read_json(today)
-# print(f'\nread_json: {class_of_all_images[:50]}\n')
-
-    # global class_of_all_images
-    # with open(f"StatsIO/{args.initials}/25_12_2020/yest_inp_file.json", 'r') as f: #change here only for the initials from folder @every start of session
-    #     # with open('fundus_data.json','r') as f:
-    #     m = json.loads(f.read())
-    #     if args.is_os_win:
-    #         for i in range(len(paths_of_images)):
-    #             class_of_all_images[i] = m[paths_of_images[i].split("\\")[-1]]
-    #     else:
-    #         for i in range(len(paths_of_images)):
-    #             class_of_all_images[i] = m[paths_of_images[i].split("/")[-1]]
-
-# read_json()
-# print(class_of_all_images) #states of all the images uptil this point.
-
-
-# req_dict = {le: '-1' for le in paths_of_images}  # for this load dict
-
 
 # start of session reads from your_file.txt for unseen_idx_set
 def start_new_session():
@@ -601,3 +582,4 @@ if __name__ == '__main__':
     app.run_server(host='127.0.0.1', port=port, debug=True)
 
 
+# print
