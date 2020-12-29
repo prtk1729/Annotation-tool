@@ -68,6 +68,9 @@ def reset_json_file():
             with open(f"StatsIO/{args.initials}/{day}_{month}_{year}/time_logs.json", "w") as fp:
                 fp.write(json.dumps(time_log_dict))
 
+            with open(f"StatsIO/{args.initials}/{day}_{month}_{year}/images_annotated_today.json", "w") as fp:
+                fp.write(json.dumps({}))
+
 
         if args.initials == 'gv':
             with open(f'your_file_gv.txt', 'w') as f:
@@ -83,6 +86,10 @@ def reset_json_file():
 
             with open(f"StatsIO/{args.initials}/{day}_{month}_{year}/time_logs.json", "w") as fp:
                 fp.write(json.dumps(time_log_dict))
+
+            with open(f"StatsIO/{args.initials}/{day}_{month}_{year}/images_annotated_today.json", "w") as fp:
+                fp.write(json.dumps({}))
+
 
 
         if args.initials == 'gn':
@@ -100,6 +107,8 @@ def reset_json_file():
             with open(f"StatsIO/{args.initials}/{day}_{month}_{year}/time_logs.json", "w") as fp:
                 fp.write(json.dumps(time_log_dict))
 
+            with open(f"StatsIO/{args.initials}/{day}_{month}_{year}/images_annotated_today.json", "w") as fp:
+                fp.write(json.dumps({}))
 
 
 
@@ -120,6 +129,9 @@ def reset_json_file():
 
             with open(f"StatsIO\\{args.initials}\\{day}_{month}_{year}\\time_logs.json", "w") as fp:
                 fp.write(json.dumps(time_log_dict))
+
+            with open(f"StatsIO\\{args.initials}\\{day}_{month}_{year}\\images_annotated_today.json", "w") as fp:
+                fp.write(json.dumps({}))
 
 
         if args.initials == 'gv':
