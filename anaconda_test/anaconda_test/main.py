@@ -35,6 +35,7 @@ args = arg_container.parse_args()
 
 # ===========global variables==========================
 unseen_idx_set = set({})
+unseen_idx_set_start = set({})
 unseen_idx_list = []
 gl_state_18 = []
 gl_current_18 = []
@@ -172,6 +173,7 @@ def start_new_session():
     global unseen_idx_set
     global paths_of_images
     global unseen_idx_list
+    global unseen_idx_set_start
     global session_start_time
 
     my_file = open(f"your_file_{args.initials}.txt", "r")
@@ -182,6 +184,7 @@ def start_new_session():
     else:
         ssi = list(content.split('\n'))
         ssi = [int(le) for le in ssi if le != '']
+        unseen_idx_set_start = set(ssi)
         unseen_idx_set = set(ssi)
         unseen_idx_list = list(unseen_idx_set)
 
@@ -395,7 +398,7 @@ def next(c1):
     global batch_end_time
 
     # Only save the logs in MM not to disk yet
-    batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=True)
+    batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=True) #inside this fn def per_counter
 
     # check iter_no
     if int(iter_no) >= ((1000 // 18) + 1):
@@ -490,6 +493,7 @@ def stop_session(n_clicks):
     global gl_current_18
     global name_initials
     global today
+    global unseen_idx_set_start
 
     day, month, year = today.day, today.month, today.year
     current_18 = list(unseen_idx_set)[:18]
@@ -532,6 +536,24 @@ def stop_session(n_clicks):
     file1 = open(f"last_checkpoint_{args.initials}.txt", "w")
     file1.write('{}'.format(str(iter_no)))
     file1.close()
+
+
+    # create the idx-state file annotated_today
+    my_file = open(f"your_file_{args.initials}.txt", "r")
+    content = my_file.read()
+    ssi = list(content.split('\n'))
+    ssi = [int(le) for le in ssi if le != '']
+    unseen_idx_set_next = set(ssi)
+    idx_set_annotated_today = unseen_idx_set_start.difference(unseen_idx_set_next)
+    images_annotated_today_dict = {f'img_{int(idx)}.jpg': req_dict[f'img_{int(idx)}.jpg'] for idx in idx_set_annotated_today}
+    if args.is_os_win == 0:
+        with open(file='./StatsIO/{}/{}_{}_{}/images_annotated_today.json'.format(name_initials, day, month, year),mode="w") as f:
+            f.write(json.dumps(images_annotated_today_dict))
+    else:
+        with open(file='.\\StatsIO\\{}\\{}_{}_{}/images_annotated_today.json'.format(name_initials, day, month,year), mode="w") as f:
+            f.write(json.dumps(images_annotated_today_dict))
+
+
 
     print('SESSION COMPLETE!!')
     os.kill(os.getpid(), signal.SIGTERM)
