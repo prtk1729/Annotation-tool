@@ -234,7 +234,7 @@ def card_body(card_id):
         ], style={"padding": "0.05rem"})
     ]
 
-
+# make changes here to get reflected in each rectangle(card) as a whole
 def card(card_id):
     global current_18
     title = "title"
@@ -242,10 +242,15 @@ def card(card_id):
     return dbc.Card(card_body(card_id), id={
         'type': 'card',
         'index': "{}".format(card_id)  # global ids
-    }, style={"height": "215px", "width": "170px"})
+    }, style={"height": "200px", "width": "170px"})
 
 
-app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    meta_tags=[{'name': 'viewport', 'content': 'width=device-width, initial-scale=1'}]
+
+    )
 
 
 # html.Button("Start", id="start",
