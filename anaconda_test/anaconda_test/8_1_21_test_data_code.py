@@ -295,17 +295,24 @@ app = dash.Dash(
 
 
 # change styling of buttons
-app.layout = html.Div([
-    html.Button("Next", id="next",
-                style={'backgroundColor': "blue", "color": "white", "margin": "5px", "padding": "5px"}),
-    # html.Button("Save", n_clicks=0, id="save",
-    #             style={'backgroundColor': "SlateBlue", "color": "white", "margin": "5px", "padding": "5px"}),
-    html.Button("Export", value='Export', n_clicks=0, id="export",
-                style={'backgroundColor': "Tomato", "color": "white", "margin": "5px", "padding": "5px"}),
-    html.Div(id="card-deck", style={"margin": "1px", "padding": "1px"}),
-    html.H3(id='button-clicks'),
+app.layout = html.Div(
+    [
+    html.Button("Start Annotation", id="start-session", n_clicks=0,
+                style={'textAlign':'center','margin':'auto', 'backgroundColor': "Green", "color": "green", "margin": "5px", "padding": "5px", "display":'block'}),
 
-], style={'text-align': "center", "margin": "0.5em 0em"})
+    html.Button("Next", id="next", n_clicks=0,
+                style={'textAlign':'center','margin':'auto', 'backgroundColor': "blue", "color": "white", "margin": "5px", "padding": "5px", "display":"none"}),
+
+    html.Button("Stop Session", value='Stop Session', n_clicks=0, id="stop-session",
+                style={'textAlign':'center','margin':'auto', 'backgroundColor': "Tomato", "color": "white", "margin": "5px", "padding": "5px", "display":"none"}),
+
+    html.Div(id="card-deck", style={"margin": "1px", "padding": "1px" , "display":"block"}),
+
+    html.H3(id='button-clicks'),
+    ], 
+
+    style={'text-align': "center", "margin": "0.5em 0em"}
+    )
 
 
 def gen_cards(current_18):
@@ -353,147 +360,11 @@ def most_confused_18():
 
     return next_18
 
-# @app.callback(
-#     Output('load', 'children'),
-#     Input("load", "n_clicks"),
-#     prevent_initial_call=True
-#
-# )
-# def load(c1):
-#     '''calculates next set of 18 indices and assigns placeholders to these before loading
-#     invoke most_confused_18 and then predict_next_18_states'''
-#     global class_of_all_images
-#     global unseen_idx_set
-#     global current_18
-#     global state_18
-#     global iter_no
-#     global paths_of_images
-#     global batch_start_time
-#     global batch_end_time
-#
-#     batch_start_time = perf_counter()
-#
-#     # Only save the logs in MM not to disk yet
-#     # batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=False)
-#
-#     # check iter_no
-#     if int(iter_no) >= ((1000 // 18) + 1):
-#         sys.exit()
-#         # resets to start_state
-#         file1 = open(f"last_checkpoint_{args.initials}.txt", "w")
-#         file1.write('0')
-#         file1.close()
-#         print("\nlast_checkpoint file reset to 0. Do a reality check\n")
-#
-#         # before reseting mnist_json/fundus_json files 1st copy the recordings to another file
-#         with open("mnist_data.json", "r") as f1, open("previous_recordings.json", "w") as f2:
-#             f2.write(f1.read())
-#         reset_json_file(args.is_os_win)
-#         print("\n\n\n ======= No more images to be parsed. Stop the session to start from scratch again. \n\n\n")
-#
-#         unseen_idx_set = set([i for i in range(len(paths_of_images))])
-#
-#         # ======= reading the mnist_data.json file updated the previous day for this person ====================
-#         read_json() #modifies class_of_all_images globally
-#         # =======================================================================================================
-#
-#
-#         iter_no = check_point()
-#         print('New Session Resuming from iteration: {}'.format(iter_no))
-#
-#         start_new_session()
-#
-#         current_18 = most_confused_18()
-#         # print('inside next current_24: ', current_24)
-#         state_18 = predict_next_18_states(current_18)
-#
-#     else:
-#         # no need to read from your_file.txt
-#         current_18 = most_confused_18()  # next_24 will be current_24 for next iter
-#         # print(f"inside next() with current_24: {current_24}")
-#         state_18 = predict_next_18_states(current_18)  # returned state list of these current_24 points
-#         # print(f"inside next() with state_24: {state_24}")
-#
-#     return gen_cards(current_18)
 
 
 
-
-@app.callback(
-    Output('card-deck', 'children'),
-    Input("next", "n_clicks"),
-    prevent_initial_call=True
-
-)
-def next(c1):
-    '''calculates next set of 18 indices and assigns placeholders to these before loading
-    invoke most_confused_18 and then predict_next_18_states'''
-    global class_of_all_images
-    global unseen_idx_set
-    global current_18
-    global state_18
-    global iter_no
-    global paths_of_images
-    global batch_start_time
-    global batch_end_time
-    global plot_grid_session_iter_num
-
-    plot_grid_session_iter_num += 1
-    if plot_grid_session_iter_num >= 2:
-        save_functionality()
-    # Only save the logs in MM not to disk yet
-    batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=True) #inside this fn def per_counter
-
-
-    if int(iter_no) < ((1000 // 18) + 1):
-        current_18 = most_confused_18()  # next_24 will be current_24 for next iter
-        state_18 = predict_next_18_states(current_18)  # returned state list of these current_24 points
-
-    return gen_cards(current_18)
-
-
-# @app.callback(
-#     Output(component_id='save', component_property='className'),
-#     Input(component_id="save", component_property="n_clicks"),
-#     prevent_initial_call=True
-# )
-# def save(n_clicks):
-#     '''On Clicking save save (1)recordings into mnist_data.json,
-#     (2)save unseen idx already calculated in its next call into your_file.txt'''
-
-#     global iter_no
-#     global class_of_all_images
-#     global unseen_idx_set
-#     global state_18
-#     global current_18
-#     global gl_state_18
-#     global gl_current_18
-
-#     current_18 = list(unseen_idx_set)[:18]
-
-#     m = {}
-
-#     #   modify class_of_all_images before writing
-#     for i in range(len(gl_current_18)):
-#         class_of_all_images[gl_current_18[i]] = gl_state_18[i]
-
-#     # ======= saving everything in datastructures i.e MM i.e RAM for now as a session is to be treated as an atomic event =================
-#     req_dict = {f'img_{i}.jpg': class_of_all_images[i] for i in range(len(class_of_all_images))}
-
-#     unseen_idx_set = unseen_idx_set.difference(set(current_18))
-#     ssil = list(unseen_idx_set)
-
-#     print('\nEOSAVE')
-#     # print(c1)
-#     return ""
-
-
-@app.callback(
-    Output(component_id='export', component_property='className'),
-    Input(component_id="export", component_property="n_clicks"),
-    prevent_initial_call = True
-)
-def stop_session(n_clicks):
+# ============== Save Labels Uptil Now ==========================================
+def save_labels_uptil_now():
     '''Only on clicking i.e n_clicks>=1 export button would work not from starting when the app runs'''
     global batch_start_time
 
@@ -571,11 +442,123 @@ def stop_session(n_clicks):
 
 
     print(f'\n{(1 - (len(unseen_idx_set)/1000)) *100:.1f}% of the images parsed\n')
-    print('\nSESSION COMPLETE!!\n')
-    os.kill(os.getpid(), signal.SIGTERM)
-    # ==========================================================================================================================================
+    print('\nBatch of 90 images successfully saved to disk!!\n')
+
+    # Use the following in a button functionality based on the user input last part of the functionality
+    # os.kill(os.getpid(), signal.SIGTERM)
 
     return ""
+
+# ============== End of Save Labels Uptil Now ==========================================
+
+
+
+
+
+# ============== Start Session ============================================
+@app.callback(
+    [
+    Output(component_id='start-session', component_property='style'),
+    Output(component_id='next', component_property='style') ],
+    # Output(component_id='export', component_property='style')   ],
+    Input(component_id="start-session", component_property="n_clicks"),
+    prevent_initial_call = False
+)
+def start_session(n_clicks):
+    print('\nInside START Session\n')
+
+    print('start',n_clicks)
+
+    # {"display":'none'}
+    if n_clicks == 0:
+        return [{'textAlign':'center','margin':'auto', 'backgroundColor': "green", "color": "white", "display":'block'},
+                {"display":'none'},
+                ]
+
+    # {"display":'none'}
+    if n_clicks == 1:
+        return [{"display":'none'},
+                {'textAlign':'center','margin':'auto', 'backgroundColor': "blue", "color": "white", "padding": "5px", "display":'block'},
+                 ]
+ 
+
+ # ============== End of Start Session ============================================
+
+
+
+# Output('next', 'style'),
+#     Output('export', 'style')
+@app.callback(
+    [
+        Output('card-deck', 'children'),
+        Output('card-deck', 'style'),
+        # Output('next', 'style'),
+        Output('stop-session', 'style')
+     ],
+    Input("next", "n_clicks"),
+    prevent_initial_call=True
+
+)
+def next(n_clicks):
+    '''calculates next set of 18 indices and assigns placeholders to these before loading
+    invoke most_confused_18 and then predict_next_18_states'''
+    global class_of_all_images
+    global unseen_idx_set
+    global current_18
+    global state_18
+    global iter_no
+    global paths_of_images
+    global batch_start_time
+    global batch_end_time
+    global plot_grid_session_iter_num
+
+    print('\nInside next\n')
+    print(f'n_clicks: {n_clicks}')
+
+
+    if n_clicks % 6 == 0:
+        # , {'display':'none'}, {'display':'none'},
+        save_labels_uptil_now()
+        return [gen_cards(current_18), 
+                {'display':'none'}, 
+                # {'display':'none'}, 
+                {'textAlign':'center','margin':'auto', 'backgroundColor': "Tomato", "color": "black", "padding": "5px", "display":'block'}]
+
+    else:
+        plot_grid_session_iter_num += 1
+        if plot_grid_session_iter_num >= 2:
+            save_functionality()
+        # Only save the logs in MM not to disk yet
+        batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=True) #inside this fn def per_counter
+
+
+        if int(iter_no) < ((1000 // 18) + 1):
+            current_18 = most_confused_18()  # next_24 will be current_24 for next iter
+            state_18 = predict_next_18_states(current_18)  # returned state list of these current_24 points
+
+        #   {'display':'none'}, {'display':'none'},
+        return [gen_cards(current_18), 
+                {'display':'block'},  
+                # {'display':'block'}, 
+                {'display':'none'}]
+
+
+
+
+@app.callback(
+    Output(component_id='stop-session', component_property='className'),
+    Input(component_id="stop-session", component_property="n_clicks"),
+    prevent_initial_call = True
+)
+def stop_session(n_clicks):
+    '''Only on clicking i.e n_clicks>=1 export button would work not from starting when the app runs'''
+    if n_clicks == 1:
+        print('\nSESSION ENDED SUCCESSFULLY!!\n')
+        os.kill(os.getpid(), signal.SIGTERM)
+    return ""
+
+        
+
 
 
 @app.callback(
@@ -609,6 +592,6 @@ if __name__ == '__main__':
 
 
     # for testing
-    app.run_server(host='127.0.0.1', port=port, debug=True)
+    app.run_server(host='127.0.0.1', port=port, debug=False)
 
 
