@@ -405,37 +405,8 @@ def next(c1):
     # Only save the logs in MM not to disk yet
     batch_start_time, time_elapsed = calculate_ann_time(batch_start_time, save_to_disk=True) #inside this fn def per_counter
 
-    # check iter_no
-    if int(iter_no) >= ((1000 // 18) + 1):
-        sys.exit()
-        # resets to start_state
-        file1 = open(f"last_checkpoint_{args.initials}.txt", "w")
-        file1.write('0')
-        file1.close()
-        print("\nlast_checkpoint file reset to 0. Do a reality check\n")
 
-        # before reseting mnist_json/fundus_json files 1st copy the recordings to another file
-        with open("mnist_data.json", "r") as f1, open("previous_recordings.json", "w") as f2:
-            f2.write(f1.read())
-        reset_json_file(args.is_os_win)
-        print("\n\n\n ======= No more images to be parsed. Stop the session to start from scratch again. \n\n\n")
-
-        unseen_idx_set = set([i for i in range(len(paths_of_images))])
-
-        # ======= reading the mnist_data.json file updated the previous day for this person ====================
-        read_json() #modifies class_of_all_images globally
-        # =======================================================================================================
-
-
-        iter_no = check_point()
-        print('New Session Resuming from iteration: {}'.format(iter_no))
-
-        start_new_session()
-
-        current_18 = most_confused_18()
-        state_18 = predict_next_18_states(current_18)
-
-    else:
+    if int(iter_no) < ((1000 // 18) + 1):
         current_18 = most_confused_18()  # next_24 will be current_24 for next iter
         state_18 = predict_next_18_states(current_18)  # returned state list of these current_24 points
 
@@ -560,7 +531,8 @@ def stop_session(n_clicks):
 
 
 
-    print('SESSION COMPLETE!!')
+    print(f'\n{(1 - (len(unseen_idx_set)/1000)) *100:.1f}% of the images parsed\n')
+    print('\nSESSION COMPLETE!!\n')
     os.kill(os.getpid(), signal.SIGTERM)
     # ==========================================================================================================================================
 
