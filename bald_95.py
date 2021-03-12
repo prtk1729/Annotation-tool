@@ -102,13 +102,13 @@ def bald(model, images, args):
 
     # create a loader_obj
     # args.batch_size args.bundle_size
-    loader_obj = DataLoader(images, args.bundle_size)
+    # loader_obj = DataLoader(images, args.bundle_size)
     # do forward pass on dataset and get feature vectors and entropy of distributions
     # higher the entropy higher the uncertainity (more closer to uniform distribution)
     
 
     t_probs_stack = []
-    # 10 stochastic forward passes for a particular batch
+    # 100 stochastic forward passes for a particular batch
     with torch.no_grad():
         T = 100 #num of stochastic forward passes
         for i in range(T):

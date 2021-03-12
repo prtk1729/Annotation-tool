@@ -21,13 +21,9 @@ import signal
 
 
 
+initial_state_18 = [0 for i in range(18)]
 
 
-
-# paths_of_images = glob('static/pool_Set/*.jpg')
-paths_of_images = glob('static/Test_Set/*.png')
-
-class_of_all_images = [-1] * len(paths_of_images)  # stores the class annotations of all the images by initialising -1.s
 
 # =========CLI Parsing===============
 arg_container = argparse.ArgumentParser(description='Specify the Operating System')
@@ -41,6 +37,34 @@ arg_container.add_argument('--initials', "-Annotator's_name_initials", type=str,
 
 args = arg_container.parse_args()
 # ====================================
+
+
+
+
+
+
+# paths_of_images = glob('static/pool_Set/*.jpg')
+if args.is_os_win == 0:
+    paths_of_images = glob('static/Test_Set/*.png')
+else:
+    paths_of_images = glob('static\\Test_Set\\*.png')
+    #print(paths_of_images)
+
+class_of_all_images = [-1] * len(paths_of_images)  # stores the class annotations of all the images by initialising -1.s
+#print(paths_of_images)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 today = date.today()
@@ -246,6 +270,8 @@ def start_new_session():
         unseen_idx_set = set(ssi)
         unseen_idx_list = list(unseen_idx_set)
 
+    #print(unseen_idx_list) 
+
 
 start_new_session()
 
@@ -287,7 +313,7 @@ def save_functionality():
 
 
 # ============ In card_body() we initialize the placeholder values from the previous_day json-file ================
-def card_body(card_id, style):
+def card_body(card_id):
     global current_18
     global state_18
     global paths_of_images
@@ -302,7 +328,8 @@ def card_body(card_id, style):
  # dbc.CardImg(id = f'cardimg_id_{card_id}', src=paths_of_images[card_id] ,  top=True, style={"height": "125px", "width": "188px"}, n_clicks=0),
     # make changes to CardImg here the img will sit.
     return [
-        html.Img(src=paths_of_images[card_id] ,   style=style, title=f'img_{card_id}', id=f'card_index_{card_id}', className=f'img_{card_id}', n_clicks=0),
+        html.Div(dbc.CardImg(src=paths_of_images[card_id] ,  top=True, style={"height": "125px", "width": "160px", 'z-index':'3'}, id = {'type':'CardImg', 'index':f'{card_id}'} ),
+         n_clicks=0, id = {'type':'CardDiv', 'index':f'{card_id}'}),
         dbc.CardBody([
             dcc.RadioItems(
                 id={
@@ -319,7 +346,7 @@ def card_body(card_id, style):
 
                 ],
                 value=str(state_18[i]),
-                labelStyle={'display': 'inline-block', "padding": "0px 1px 0px 1px", "margin": "1px"},
+                labelStyle={'display': 'inline-block', "padding": "0px 1px 0px 1px", "margin": "1px", 'fontsize':'1px'},
                 inputStyle={"margin-right": "1px"},
                 className=""
             )
@@ -327,16 +354,16 @@ def card_body(card_id, style):
     ]
 
 # make changes here to get reflected in each rectangle(card) as a whole
-def card(card_id, style={"height": "200px", "width": "190px"}):
+def card(card_id):
     global current_18
-    title = f'img_{card_id}'
+    title = "title"
     description = "desc"
-    return dbc.Button(dbc.Card(
-        
-        card_body(card_id, style), id = {
-        'type': 'card',
+    return html.Div(card_body(card_id), id = {
+        'type': 'btncard',
         'index': "{}".format(card_id)  # global ids
-            })
+            },
+        style={"height": "210px", "width": "200px"},
+        n_clicks=0
         )
 # children=html.Img(className='icon') 
 # className=f'img_{card_id}'
@@ -386,11 +413,11 @@ def gen_cards(current_18):
 
     return [
         dbc.Row([
-            dbc.Col([card(i, style={"height": "200px", "width": "190px"})]) for i in current_18[:6]]),
+            dbc.Col([card(i)]) for i in current_18[:6]]),
         dbc.Row([
-            dbc.Col([card(i,  style={"height": "200px", "width": "190px"})]) for i in current_18[6:12]]),
+            dbc.Col([card(i)]) for i in current_18[6:12]]),
         dbc.Row([
-            dbc.Col([card(i, style={"height": "200px", "width": "190px"})]) for i in current_18[12:18]]),
+            dbc.Col([card(i)]) for i in current_18[12:18]]),
     ]
 
 
@@ -471,13 +498,14 @@ def save_labels_uptil_now(n_images):
             f.write(json.dumps(req_dict))
 
     else:
-        with open(file='.\\StatsIO\\{}\\{}_{}_{}/mnist_uptil_today_out_files.json'.format(name_initials, day, month, year),  mode="w") as f:
+        with open(file='.\\StatsIO\\{}\\{}_{}_{}\\mnist_uptil_today_out_files.json'.format(name_initials, day, month, year),  mode="w") as f:
             f.write(json.dumps(req_dict))
 
 
     # save the idx_unseen uptil now
     with open(f'your_file_{args.initials}.txt', 'w') as f:
         for item in ssil:
+            print(item)
             f.write("%s\n" % item)
 
     # save the last_checkpoint for this user so as to start from correct point the next time
@@ -499,7 +527,7 @@ def save_labels_uptil_now(n_images):
         with open(file='./StatsIO/{}/{}_{}_{}/images_annotated_today_{}.json'.format(name_initials, day, month, year, session_num),mode="w") as f:
             f.write(json.dumps(images_annotated_today_dict))
     else:
-        with open(file='.\\StatsIO\\{}\\{}_{}_{}/images_annotated_today_{}.json'.format(name_initials, day, month,year, session_num), mode="w") as f:
+        with open(file='.\\StatsIO\\{}\\{}_{}_{}\\images_annotated_today_{}.json'.format(name_initials, day, month,year, session_num), mode="w") as f:
             f.write(json.dumps(images_annotated_today_dict))
 
 
@@ -574,6 +602,7 @@ def next(n_clicks):
     global batch_start_time
     global batch_end_time
     global plot_grid_session_iter_num
+    global initial_state_18
 
     print('\nInside next\n')
     print(f'n_clicks: {n_clicks}')
@@ -588,6 +617,10 @@ def next(n_clicks):
                 {'textAlign':'center','margin':'auto', 'backgroundColor': "Tomato", "color": "black", "padding": "5px", "display":'block'}]
 
     else:
+        # reset initial_state_18 i.e for the initial_states of button-n_clicks for radiobuttons
+        # when n_clicks (next) %6 !=0
+
+        initial_state_18 = [0 for i in range(18)]
         plot_grid_session_iter_num += 1
         if plot_grid_session_iter_num >= 2:
             save_functionality()
@@ -623,66 +656,127 @@ def stop_session(n_clicks):
         os.kill(os.getpid(), signal.SIGTERM)
     return ""
 
-        
+
+
+
+
+
+
+
+
+# ================ magnify callback ===================================
 #  Output(component_id={'type':'card', 'index':MATCH}, component_property='style'),
 #     Output(component_id="cardimg_id_0", component_property='style'),
-@app.callback(
-    Output(component_id={'type':'card', 'index':MATCH}, component_property='style'),
-    Input(component_id={'type':'card', 'index':MATCH}, component_property="id"),
-    Input(component_id={'type':'card', 'index':MATCH}, component_property="id"),
+# @app.callback(dd.Output('image_wc', 'src'), [dd.Input('image_wc', 'id')])
 
-    prevent_initial_call = False
+# @app.callback(
+#     Output(component_id='img_id_0', component_property='className'),
+#     [Input(component_id='img_id_0', component_property='n_clicks'),
+#     Input(component_id='img_id_0', component_property='id')],
+# )
+
+
+
+
+@app.callback(
+    Output(component_id={'type':'CardImg', 'index':MATCH}, component_property='style'),
+    [Input(component_id={'type':'CardDiv', 'index':MATCH}, component_property='n_clicks'),
+    Input(component_id={'type':'CardDiv', 'index':MATCH}, component_property='id'),
+    ],
+    prevent_initial_call = True
 )
-def on_hover(id):
+def on_hover(n_clicks, id):
     '''Only on clicking i.e n_clicks>=1 export button would work not from starting when the app runs'''
 
+    
     print('\nInside on_hover\n')
-    print('value, id', id)
-    cardimg_index = id['index']
-    # card(int(id['index']), style={'height':'150%', 'width':'auto'})
+    # print('value, id', id)
+    # cardimg_index = id['index']
+    # print('')
+    # # if n_clicks == 1:
+    # #     print('\nInside Hover Img\n')
+    # return {'height':'50%',  'width':"auto"}
+    print(id)
+    print(n_clicks)
 
-    if n_clicks == 1:
-        print('\nInside Hover Img\n')
-    return {'height':'50%',  'width':"auto"}
+    if id['type'] == 'CardDiv':
+        if n_clicks % 2 == 1:
+            print(n_clicks)
+            print(f"\n{id}, {id['type']}\n")
+
+            print('\nEnd on_hover\n')
+
+            return   {'height':'50%',  'width':"50%", 'z-index':'20', 'position':'fixed', "top": "10%" , "left": "10%", 'margin': '-70px 0 0 -170px' }
+        else:
+            print(n_clicks)
+            print(f"\n{id}, {id['type']}\n")
+            print('\nEnd on_hover\n')
+
+            return {"height": "125px", "width": "160px", 'z-index':'3'}
+    
+
+# ================ magnify callback ===================================
+
+
+
+#  {'height':'50%',  'width':"50%", 'z-index':'20', 'position':'fixed', "top": "10%" , "left": "10%", 'margin': '-70px 0 0 -170px' }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.callback(
+    # Output({'type': 'label-option', 'index': MATCH}, 'labelStyle'),
     Output({'type': 'label-option', 'index': MATCH}, 'className'),
     Input({'type': 'label-option', 'index': MATCH}, 'value'),
     Input({'type': 'label-option', 'index': MATCH}, 'id'),
     prevent_initial_call = True
-
 )
 def button_click(value, id):
     '''What are the states of the radio buttons clicked?'''
     # I have the value of the recording here ,
     # Manipulate here and store in a datastructure and fire when save is clicked
     # print(f"val: {value}, id: {id}")
+    print('\nStart on_click')
 
     global class_of_all_images
     global glob_idx
     global current_18
     global state_18
+    global initial_state_18
     class_of_all_images[int(id['index'])] = int(value)
-    print('\nInside button_click\n')
-    # card(int(id['index']), style={'height':'150%', 'width':'auto'})
-
-
     print("class of {} set to {}".format(id['index'], value))
+
+
     for i in range(len(current_18)):
         if int(current_18[i]) == int(id['index']):
+            # found the id['index' ] of the radio-button
+            # for this image 
             break
     state_18[i] = int(value)
-    return ""
+    print('\nEnd on_click\n')
+
+    # return {'display': 'inline-block', 'color':'black', "padding": "0px 1px 0px 1px", "margin": "1px", 'fontsize':'1px'}
+    return "touched"
 
 
 if __name__ == '__main__':
     port = random.randrange(2000, 7999)
     # during development
-    # app.run_server(host='127.0.0.1', port=port, debug=True)
+    app.run_server(host='127.0.0.1', port=port, debug=True)
 
 
     # for testing
-    app.run_server(host='127.0.0.1', port=port, debug=True)
+    # app.run_server(host='127.0.0.1', port=port, debug=False)
 
 
 # ,  dev_tools_ui=False

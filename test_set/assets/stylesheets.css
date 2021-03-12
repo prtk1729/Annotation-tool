@@ -1,0 +1,40 @@
+.icon
+{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    height: 20% ; 
+    width: auto ;
+    content:url("../static/Test_Set/img_0.png");
+}
+
+.icon:hover
+{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    height: 50% ; 
+    width: auto ;
+    content:url("../static/Test_Set/img_0.png");
+}
+
+
+.img_0
+{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    height: 20% ; 
+    width: auto ;
+    content:url("../static/Test_Set/img_0.png");
+}
+
+.img_0:hover
+{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    height: 150% ; 
+    width: auto ;
+    content:url("../static/Test_Set/img_0.png");
+}

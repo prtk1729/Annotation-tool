@@ -114,7 +114,7 @@ def reset_json_file():
                         f.write("%s\n" % item)
 
 
-            with open(f"StatsI\\hk\\{day}_{month}_{year}\\yest_inp_file.json", "w") as fp:
+            with open(f"StatsIO\\hk\\{day}_{month}_{year}\\yest_inp_file.json", "w") as fp:
                 json.dump(obj=hk_dict, fp=fp)
 
 
