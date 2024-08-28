@@ -11,16 +11,23 @@ A tool to annotate images in a large dataset efficiently by incorporating Machin
 
 ## Setup (Done only the first time)
 * Clone the repo. 
-* Download Miniconda from here --> https://docs.conda.io/en/latest/miniconda.html
-* Once downloaded open the exectuable File 'Miniconda3-latest-Windows-x86_64'. And follow the usual installation process.
-* After the installation gets completed open command-prompt and type conda --version. If you get a prompt saying: "conda 4.9.2", you have correctly installed.
+* Download Miniconda from here `https://docs.conda.io/en/latest/miniconda.html`
+* Once downloaded open the exectuable File `Miniconda3-latest-Windows-x86_64`. And follow the usual installation process.
+* After the installation gets completed open command-prompt and type `conda --version`. If you get a prompt saying: `conda 4.9.2`, you have correctly installed.
 * Create a conda env: 
-     $ conda create -y -n at37 python=3.7
+  - ```bash
+     conda create -y -n at37 python=3.7```
 
-* Type 'conda activate at37' and Enter.
+* Create an environment:
+  - ```bash
+    conda activate at37
+    ```
 * Navigate to the local folder where you have the cloned repo.
 * Ensure you are present in **Seeds_Project/Ann_Tool_Seeds_Proj**
-* pip install -r requirements.txt
+* Install dependencies
+  - ```bash
+  pip install -r requirements.txt
+  ```
 
 
 
