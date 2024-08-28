@@ -22,15 +22,14 @@ A tool to annotate images in a large dataset efficiently by incorporating Machin
 * Ensure you are present in **Seeds_Project/Ann_Tool_Seeds_Proj**
 * pip install -r requirements.txt
 
-### Before executing the following 3 commands ensure all the required Image-Folders are present under the **Seeds_Project/Ann_Tool_Seeds_Proj/static** folder as subfolders.
-#### Start of the very first session on a particular day. A session is said to end when you click on 'Stop Session' button in the Annotation Tool.
-* python create_start_state.py --is_os_win 0 --initials hk --run 1 --global_reset 1 --img_dir_path ./static/Path2ImageFolder
-* python create_start_state.py --is_os_win 0 --initials hk --run 1 --global_reset 0 --img_dir_path ./static/Path2ImageFolder
-* python main_test_data_temp.py --is_os_win 0 --initials hk --img_dir_path ./static/Path2ImageFolder
-* Copy everything after 'Dash is running on' say (http://127.0.0.1:7236) and open a new browser tab (say Chrome/Mozilla etc) and paste in the URL field of the tab.
 
 
-#### Starting a session after the first session on a particular day.
-* python create_start_state.py --is_os_win 0 --initials hk --run 1 --global_reset 0 --img_dir_path ./static/Path2ImageFolder
-* python main_test_data_temp.py --is_os_win 0 --initials hk --img_dir_path ./static/Path2ImageFolder
+
+#### Starting a session 
+* ```bash
+  python create_start_state.py --is_os_win 0 --initials hk --run 1 --global_reset 0 --img_dir_path ./static/Path2ImageFolder
+  ```
+* ```bash
+  python main.py --is_os_win 0 --initials hk --img_dir_path ./static/Path2ImageFolder
+  ```
 * Copy everything after 'Dash is running on' say (http://127.0.0.1:7236) and open a new browser tab (say Chrome/Mozilla etc) and paste in the URL field of the tab.
