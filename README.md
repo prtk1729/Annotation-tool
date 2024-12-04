@@ -1,7 +1,7 @@
 # Annotation-Tool
 A tool to annotate images in a large dataset efficiently by incorporating Machine Learning techniques.
 
-We developed an offline mobile web app (local setup available) that is designed primarily to annotate unlabeled images. To minimize the cost of annotation (i.e number of images to be manually annotated), we use Active Learning for predicting the labels of the next set of images by an ML model which learns from the images manually annotated by a domain expert. 
+We developed an offline mobile web app (local setup available) that is designed primarily to annotate unlabeled images. To minimize the cost of annotation (i.e number of images to be manually annotated), we use Batch Active Learning for predicting the labels of the next set of images by an ML model which learns from the images manually annotated by a domain expert. 
 
 
 # Project Goals:
